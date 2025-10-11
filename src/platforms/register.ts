@@ -1,6 +1,8 @@
 /**
- * Registers all supported platform factories with the registry. Applications
- * call this during bootstrap so that runtime switching is possible.
+ * Purpose:
+ * - Registers platform factories with the central LLMRegistry. 
+ * - Enables runtime platform switching by making all supported platforms available.
+ * - Called during application bootstrap (as seen in demo.ts)
  */
 
 import { llmRegistry } from '../registry/llm-registry.js';

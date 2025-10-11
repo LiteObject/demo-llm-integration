@@ -1,6 +1,6 @@
 # Demo LLM Integration
 
-This project demonstrates how to combine the Strategy, Abstract Factory, and Adapter design patterns to build a flexible large language model (LLM) chat integration layer in TypeScript. The code shows how to switch between platforms (Bedrock, Azure AI, Google Vertex, Ollama), providers, and models at runtime without sprinkling platform-specific conditionals across the application.
+This project demonstrates how to combine the Strategy, Abstract Factory, and Adapter design patterns to build a flexible large language model (LLM) integration layer in TypeScript. The code shows how to switch between platforms (Bedrock, Azure AI, Google Vertex, Ollama), providers, and models at runtime without sprinkling platform-specific conditionals across the application.
 
 ## Design Patterns Used
 
@@ -121,65 +121,7 @@ sequenceDiagram
     ChatService-->>App: ChatResponse
 ```
 
-### Class Relationships (UML Style)
 
-```mermaid
-classDiagram
-    class LLMStrategy {
-        <<interface>>
-        +sendMessage(prompt, options) ChatResponse
-        +streamMessage(prompt, options) AsyncIterable
-    }
-    
-    class LLMFactory {
-        <<interface>>
-        +createClient(model) LLMStrategy
-        +listAvailableModels() string[]
-    }
-    
-    class ChatService {
-        -strategy: LLMStrategy
-        -config: ProviderConfig
-        +configure(config)
-        +send(prompt, options) ChatResponse
-        +stream(prompt, options) AsyncIterable
-        +getCurrentConfiguration() ProviderConfig
-    }
-    
-    class LLMRegistry {
-        -factories: Map
-        +register(platform, factory)
-        +getFactory(platform) LLMFactory
-        +listPlatforms() string[]
-    }
-    
-    class BedrockFactory {
-        +createClient(model) LLMStrategy
-        +listAvailableModels() string[]
-    }
-    
-    class BedrockStrategy {
-        -client: BedrockClient
-        -model: string
-        +sendMessage(prompt, options) ChatResponse
-        +streamMessage(prompt, options) AsyncIterable
-    }
-    
-    LLMStrategy <|.. BedrockStrategy : implements
-    LLMStrategy <|.. AzureStrategy : implements
-    LLMStrategy <|.. GoogleStrategy : implements
-    
-    LLMFactory <|.. BedrockFactory : implements
-    LLMFactory <|.. AzureFactory : implements
-    LLMFactory <|.. GoogleFactory : implements
-    
-    ChatService --> LLMStrategy : uses
-    ChatService --> LLMRegistry : queries
-    LLMRegistry --> LLMFactory : manages
-    BedrockFactory --> BedrockStrategy : creates
-    
-    BedrockStrategy --> BedrockClient : adapts
-```
 
 ### Data Flow Through Patterns
 
@@ -350,37 +292,6 @@ graph TD
     style AP fill:#fff0e6
     style SF fill:#e6ffe6
     style RP fill:#f0e6ff
-```
-
-### Adding a New Platform Flow
-
-```mermaid
-graph TD
-    Start([New Platform Needed])
-    
-    Start --> CreateDir[1. Create Platform Directory]
-    CreateDir --> CreateStrategy[2. Implement Strategy/Adapter]
-    CreateStrategy --> CreateFactory[3. Implement Factory]
-    CreateFactory --> MockSDK{Need Mock SDK?}
-    
-    MockSDK -->|Yes| CreateMock[4a. Create Mock Client]
-    MockSDK -->|No| UseReal[4b. Import Real SDK]
-    
-    CreateMock --> Register[5. Register Factory]
-    UseReal --> Register
-    
-    Register --> UpdateTypes[6. Update TypeScript Types]
-    UpdateTypes --> AddTests[7. Add Unit Tests]
-    AddTests --> UpdateDocs[8. Update Documentation]
-    UpdateDocs --> Verify[9. Run Build & Tests]
-    
-    Verify --> Success([Platform Ready])
-    
-    style Start fill:#e1f5e1
-    style Success fill:#e1f5e1
-    style CreateStrategy fill:#d4e9ff
-    style CreateFactory fill:#fff3cd
-    style Register fill:#ffe6e6
 ```
 
 ## When to Use This Pattern
